@@ -1,0 +1,57 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>滁州24小时温度预报</title>
+</head>
+
+<body>
+	<div class="container">
+		<div class="row">
+			<div  id="line" style="width:800px;height:350px;border:1px solid #ccc;padding:10px;"></div>
+		</div>
+	</div>
+	
+	<script src="../script/echarts.js"></script>
+	<script src="../script/zepto.min.js"></script>
+	<script src="../script/setCharts.js"></script>
+	
+	<script type="text/javascript">
+		require.config({
+        	paths: {
+            	echarts: '../script'
+        	}
+    	});
+		require(
+        	[
+            	'echarts',
+            	'echarts/chart/line'
+        	],
+			function (ec) {
+				mychart = ec.init(document.getElementById('line'));
+				
+			}
+		);
+		$.ajax({
+			type: 'GET',
+			url: domain+'rest/v100/tq/statis',
+			// data to be added to query string:
+			data: { token: 'token' },
+			// type of data we are expecting in return:
+			dataType: 'json',
+			success: function(data){
+				wdOption.xAxis[0].data = getTimeAxis(data);
+				wdOption.series[0].data = getWdData(data);
+				mychart.setOption(wdOption);
+			},
+			error: function(xhr, type){
+				alert('Ajax error!')
+			}
+		})
+		
+		
+	</script>
+</body>
+</html>
