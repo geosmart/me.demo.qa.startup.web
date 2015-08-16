@@ -1,1 +1,7 @@
-docker run -p 80:80 -p 9001:9001 -p 8080:8080 -t -i guuuo/javaweb
+#!/bin/bash
+
+if [ ! -f /.tomcat_admin_created ]; then
+    /create_tomcat_admin_user.sh
+fi
+
+exec ${CATALINA_HOME}/bin/catalina.sh run
