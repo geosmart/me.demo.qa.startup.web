@@ -1,6 +1,6 @@
 
 #Build java web app container image 
-FROM daocloud.io/centos6
+FROM centos:centos6
 MAINTAINER geosmart<geosmart.github.io>
 
 #Make java and tomcat install directory
