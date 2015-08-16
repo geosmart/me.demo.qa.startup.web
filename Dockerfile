@@ -1,28 +1,31 @@
 
 #Build java web app container image 
-FROM centos:centos6
+FROM daocloud.io/centos6
 MAINTAINER geosmart<geosmart.github.io>
 
 #Make java and tomcat install directory
-RUN apt-get update && \
-    apt-get install -yq --no-install-recommends wget pwgen ca-certificates && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+WORKDIR /home/
 
-ENV TOMCAT_MAJOR_VERSION 7
-ENV TOMCAT_MINOR_VERSION 7.0.55
-ENV CATALINA_HOME /tomcat
+RUN yum update -y && yum install -y \
+	tar \
+	wget \
+	java-1.7.0-openjdk-devel
 
-# INSTALL TOMCAT
-RUN wget -q https://archive.apache.org/dist/tomcat/tomcat-${TOMCAT_MAJOR_VERSION}/v${TOMCAT_MINOR_VERSION}/bin/apache-tomcat-${TOMCAT_MINOR_VERSION}.tar.gz && \
-    wget -qO- https://archive.apache.org/dist/tomcat/tomcat-${TOMCAT_MAJOR_VERSION}/v${TOMCAT_MINOR_VERSION}/bin/apache-tomcat-${TOMCAT_MINOR_VERSION}.tar.gz.md5 | md5sum -c - && \
-    tar zxf apache-tomcat-*.tar.gz && \
-    rm apache-tomcat-*.tar.gz && \
-    mv apache-tomcat* tomcat
+# Install Tomcat 7
+RUN wget https://archive.apache.org/dist/tomcat/tomcat-7/v7.0.57/bin/apache-tomcat-7.0.57.tar.gz && \
+	tar xzf apache-tomcat-7.0.57.tar.gz && \
+	mv apache-tomcat-7.0.57 /usr/local/tomcat7 && \
+	rm apache-tomcat-7.0.57.tar.gz
 
-ADD create_tomcat_admin_user.sh /create_tomcat_admin_user.sh
-ADD run.sh /run.sh
-RUN chmod +x /*.sh
+# Deploy .war
+RUN rm -rf /usr/local/tomcat7/webapps/ROOT
+ADD ./deploy/demo.war /usr/local/tomcat7/webapps/ROOT.war
 
-EXPOSE 8080
-CMD ["/run.sh"]
+# Make Tomcat daemon
+COPY init.d-tomcat /etc/rc.d/init.d/tomcat
+RUN chmod 755 /etc/rc.d/init.d/tomcat
+
+ADD ./run.sh /home/run.sh
+RUN chmod +x /home/run.sh
+
+CMD ["/home/run.sh"]

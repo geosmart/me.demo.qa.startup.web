@@ -1,7 +1,6 @@
 #!/bin/bash
 
-if [ ! -f /.tomcat_admin_created ]; then
-    /create_tomcat_admin_user.sh
-fi
+service tomcat start
 
-exec ${CATALINA_HOME}/bin/catalina.sh run
+echo "Press any key to exit"
+read KEY
